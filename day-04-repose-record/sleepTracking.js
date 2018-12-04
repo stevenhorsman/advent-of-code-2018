@@ -1,70 +1,49 @@
+//Re-work based on https://github.com/mariotacke/advent-of-code-2018/blob/master/day-04-repose-record/sleep.js
+class Guard {
+  constructor (id) {
+    this.id = id;
+    this.sleep = Array.from({ length: 60 }).map(() => 0);
+  }
+
+  get totalSleepMinutes() {
+    return this.sleep.reduce((a, b) => a + b, 0);
+  }
+
+  get sleepiestMinute() {
+    return this.sleep
+      .map((frequency, minute) => ({ minute, frequency }))
+      .sort((a, b) => b.frequency - a.frequency)[0].minute;
+  }
+}
+
 function calculateMostAsleep(input) {
-  let minute = 0;
+  const logs = sortInputByDate(input);
+  let guards = createGuardsMaps(logs);
 
-  //Sort by date
-  const logs = input
-  .split('\n')
-  .map((line) => {
-    line = line.trim();
-    result = line.match(/\[(.+)\] (.+)/);
-    return {date: new Date(result[1]), event: result[2]}
-  })
-  .sort((a, b) => a.date - b.date);
+  const sleepiestGuard = Object
+    .keys(guards)
+    .map((guardId) => guards[guardId])
+    .sort((a, b) => b.totalSleepMinutes - a.totalSleepMinutes)[0];
 
-  let guards = new Map();
-  let guardId = -1;
-  let fallsAsleep;
-  logs.forEach(log => {
-    const guardMatch = log.event.match(/(Guard #|)(\d+)( begins shift)/);
-    if(guardMatch != null) {
-      guardId = guardMatch[2];
-      if(!guards.has(guardId)) {
-        guards.set(guardId, new Map());
-      }
-    } else if(log.event === "falls asleep") {
-      fallsAsleep = log.date.getMinutes();
-    } else if(log.event === "wakes up") {
-      for (let i = fallsAsleep; i < log.date.getMinutes(); i++) {
-        let guardRec = guards.get(guardId);
-        let minCount = (guardRec.get(i) || 0) + 1
-        guardRec.set(i, minCount);
-      }
-    }
-  })
-
-  let maxGuardId = -1;
-  let maxGuardMins = -1;
-  guardSum = {}
-  guards.forEach((value,key) => {
-    const counts = Array.from(value.values());
-    if (counts.length == 0) {
-      return;
-    }
-      const sum = counts.reduce((total, amount) => total + amount); 
-      if (sum > maxGuardMins) {
-        maxGuardId = key;
-        maxGuardMins= sum
-      }
-  });
-
-  maxGuardMins = -1;
-  guards.get(maxGuardId).forEach((value,key) => {
-    if (value > maxGuardMins) {
-      minute = key;
-      maxGuardMins = value;
-    }
-  });
-
-  console.log("Sleepiest guard is",maxGuardId,"sleepiest Min",minute)
-  return maxGuardId * minute;
+  console.log("Sleepiest guard is",sleepiestGuard.id,"sleepiest Min",sleepiestGuard.sleepiestMinute)
+  return sleepiestGuard.id * sleepiestGuard.sleepiestMinute;
 }
 
 function calculateSleepyistMinute(input) {
+  const logs = sortInputByDate(input);
+  let guards = createGuardsMaps(logs);
+  
+  const sleepiestGuard = Object
+  .keys(guards)
+  .map((guardId) => guards[guardId])
+  .sort((a, b) => b.sleep[b.sleepiestMinute] - a.sleep[a.sleepiestMinute])[0];
 
-  let minute = 0;
+  console.log("Sleepiest guard is",sleepiestGuard.id,"sleepiest Min",sleepiestGuard.sleepiestMinute)
+  return sleepiestGuard.id * sleepiestGuard.sleepiestMinute;
+}
 
-  //Sort by date
-  const logs = input
+function sortInputByDate(input) {
+  return input
   .split('\n')
   .map((line) => {
     line = line.trim();
@@ -72,44 +51,33 @@ function calculateSleepyistMinute(input) {
     return {date: new Date(result[1]), event: result[2]}
   })
   .sort((a, b) => a.date - b.date);
+}
 
-  let guards = new Map();
+function createGuardsMaps(logs) {
+  const guards = {}
+
   let guardId = -1;
   let fallsAsleep;
   logs.forEach(log => {
     const guardMatch = log.event.match(/(Guard #|)(\d+)( begins shift)/);
-    if(guardMatch != null) {
+    if (guardMatch != null) {
       guardId = guardMatch[2];
-      if(!guards.has(guardId)) {
-        guards.set(guardId, new Map());
+      if (guards[guardId] == null) {
+        guards[guardId] = new Guard(guardId);
       }
-    } else if(log.event === "falls asleep") {
+    }
+    else if (log.event === "falls asleep") {
       fallsAsleep = log.date.getMinutes();
-    } else if(log.event === "wakes up") {
+    }
+    else if (log.event === "wakes up") {
       for (let i = fallsAsleep; i < log.date.getMinutes(); i++) {
-        let guardRec = guards.get(guardId);
-        let minCount = (guardRec.get(i) || 0) + 1
-        guardRec.set(i, minCount);
+        let guardRec = guards[guardId];
+        let minCount = (guardRec.sleep[i] || 0) + 1;
+        guardRec.sleep[i] = minCount;
       }
     }
   });
-
-  let maxGuardId = -1;
-  let maxGuardMins = -1;
-  guardSum = {}
-  guards.forEach((map,guardId) => {
-    map.forEach((frequency,min) => {
-      if (frequency > maxGuardMins) {
-        minute = min;
-        maxGuardMins = frequency;
-        maxGuardId = guardId;
-      }
-    });
-  });
-
-  console.log("Sleepiest guard is",maxGuardId,"sleepiest Min",minute)
-  return maxGuardId * minute;
-
+  return guards;
 }
 
 module.exports.calculateMostAsleep = calculateMostAsleep;
