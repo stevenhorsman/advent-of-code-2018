@@ -12,7 +12,7 @@ describe('Day 3: No Matter How You Slice It', () => {
          #2 @ 3,1: 4x4
          #3 @ 5,5: 2x2`;
   
-         expect(fabric.calculateOverlap(claims)).to.equal(4);
+      expect(fabric.calculateOverlap(claims)).to.equal(4);
     });
 
     it('Input file should return', () => {
@@ -21,14 +21,14 @@ describe('Day 3: No Matter How You Slice It', () => {
     });
   });
 
-  describe.only('Part Two', () => {
+  describe('Part Two', () => {
     it('should find if of non-overlapping claim', () => {
       const claims =
         `#1 @ 1,3: 4x4
          #2 @ 3,1: 4x4
          #3 @ 5,5: 2x2`;
   
-         expect(fabric.findGoodClaim(claims)).to.equal(3);
+      expect(fabric.findGoodClaim(claims)).to.equal(3);
     });
 
     it('Input file should return', () => {

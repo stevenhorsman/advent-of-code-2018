@@ -5,7 +5,7 @@ const sleepTracking = require('./sleepTracking');
 
 describe('Day 4: Repose Record', () => {
     
-  describe.only('Part One', () => {
+  describe('Part One', () => {
     it('should determine sleepiest guard (strategy 1)', () => {
       const schedule =
         `[1518-11-01 00:00] Guard #10 begins shift
@@ -30,8 +30,8 @@ describe('Day 4: Repose Record', () => {
     });
 
     it('Input file should return', () => {
-      const input = fs.readFileSync('day-03-no-matter-how-you-slice-it/input.txt').toString();
-      expect(sleepTracking.calculateMostAsleep(input)).to.equal(118858);
+      const input = fs.readFileSync('day-04-repose-record/input.txt').toString();
+      expect(sleepTracking.calculateMostAsleep(input)).to.equal(19830);
     });
   });
 
@@ -56,12 +56,12 @@ describe('Day 4: Repose Record', () => {
          [1518-11-05 00:45] falls asleep
          [1518-11-05 00:55] wakes up`;
   
-         expect(sleepTracking.calculateMostAsleep(clscheduleaims)).to.equal(4455);
+         expect(sleepTracking.calculateSleepyistMinute(schedule)).to.equal(4455);
     });
 
     it('Input file should return', () => {
-      const input = fs.readFileSync('day-03-no-matter-how-you-slice-it/input.txt').toString();
-      expect(sleepTracking.calculateMostAsleep(input)).to.equal(118858);;
+      const input = fs.readFileSync('day-04-repose-record/input.txt').toString();
+      expect(sleepTracking.calculateSleepyistMinute(input)).to.equal(43695);
     });
   });
 });

@@ -1,45 +1,116 @@
 function calculateMostAsleep(input) {
-  let guardId = 0
   let minute = 0;
-  const log = input
-    .split('\n')
-    .map((x) => x.trim());
 
-  // Organise inputs - sort chron
-  // foreach guard work out asleep mins
-  // work out sleepiest guard
-  // work out sleepiest time.
+  //Sort by date
+  const logs = input
+  .split('\n')
+  .map((line) => {
+    line = line.trim();
+    result = line.match(/\[(.+)\] (.+)/);
+    return {date: new Date(result[1]), event: result[2]}
+  })
+  .sort((a, b) => a.date - b.date);
 
-  return guardId * minute;
+  let guards = new Map();
+  let guardId = -1;
+  let fallsAsleep;
+  logs.forEach(log => {
+    const guardMatch = log.event.match(/(Guard #|)(\d+)( begins shift)/);
+    if(guardMatch != null) {
+      guardId = guardMatch[2];
+      if(!guards.has(guardId)) {
+        guards.set(guardId, new Map());
+      }
+    } else if(log.event === "falls asleep") {
+      fallsAsleep = log.date.getMinutes();
+    } else if(log.event === "wakes up") {
+      for (let i = fallsAsleep; i < log.date.getMinutes(); i++) {
+        let guardRec = guards.get(guardId);
+        let minCount = (guardRec.get(i) || 0) + 1
+        guardRec.set(i, minCount);
+      }
+    }
+  })
+
+  let maxGuardId = -1;
+  let maxGuardMins = -1;
+  guardSum = {}
+  guards.forEach((value,key) => {
+    const counts = Array.from(value.values());
+    if (counts.length == 0) {
+      return;
+    }
+      const sum = counts.reduce((total, amount) => total + amount); 
+      if (sum > maxGuardMins) {
+        maxGuardId = key;
+        maxGuardMins= sum
+      }
+  });
+
+  maxGuardMins = -1;
+  guards.get(maxGuardId).forEach((value,key) => {
+    if (value > maxGuardMins) {
+      minute = key;
+      maxGuardMins = value;
+    }
+  });
+
+  console.log("Sleepiest guard is",maxGuardId,"sleepiest Min",minute)
+  return maxGuardId * minute;
 }
 
-// function findGoodClaim(input) {
+function calculateSleepyistMinute(input) {
 
-//   const claims = input
-//     .split('\n')
-//     .map((claim) => {
-//       result = claim.match(/#(\d+) @ (\d+),(\d+): (\d+)x(\d+)/);
-//       return {id:+result[1], x:+result[2], y:+result[3],width:+result[4],height:+result[5]}
-//     });
+  let minute = 0;
 
-    
+  //Sort by date
+  const logs = input
+  .split('\n')
+  .map((line) => {
+    line = line.trim();
+    result = line.match(/\[(.+)\] (.+)/);
+    return {date: new Date(result[1]), event: result[2]}
+  })
+  .sort((a, b) => a.date - b.date);
 
-//     for (let i = 0; i < claims.length; i++) {
-//       overlap = false;
-//       for (let j = 0; j < claims.length; j++) {
-//         if (i === j) {
-//           continue;
-//         }
-//         if (isOverlap(claims[i],claims[j])) {
-//           overlap = true;
-//           break;
-//         }
-//       }
-//       if (!overlap) {
-//         return claims[i].id
-//       }
-//     }
-// }
+  let guards = new Map();
+  let guardId = -1;
+  let fallsAsleep;
+  logs.forEach(log => {
+    const guardMatch = log.event.match(/(Guard #|)(\d+)( begins shift)/);
+    if(guardMatch != null) {
+      guardId = guardMatch[2];
+      if(!guards.has(guardId)) {
+        guards.set(guardId, new Map());
+      }
+    } else if(log.event === "falls asleep") {
+      fallsAsleep = log.date.getMinutes();
+    } else if(log.event === "wakes up") {
+      for (let i = fallsAsleep; i < log.date.getMinutes(); i++) {
+        let guardRec = guards.get(guardId);
+        let minCount = (guardRec.get(i) || 0) + 1
+        guardRec.set(i, minCount);
+      }
+    }
+  });
+
+  let maxGuardId = -1;
+  let maxGuardMins = -1;
+  guardSum = {}
+  guards.forEach((map,guardId) => {
+    map.forEach((frequency,min) => {
+      if (frequency > maxGuardMins) {
+        minute = min;
+        maxGuardMins = frequency;
+        maxGuardId = guardId;
+      }
+    });
+  });
+
+  console.log("Sleepiest guard is",maxGuardId,"sleepiest Min",minute)
+  return maxGuardId * minute;
+
+}
 
 module.exports.calculateMostAsleep = calculateMostAsleep;
-//module.exports.findGoodClaim = findGoodClaim;
+module.exports.calculateSleepyistMinute = calculateSleepyistMinute;
