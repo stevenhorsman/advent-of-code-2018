@@ -21,8 +21,8 @@ describe('Day 3: No Matter How You Slice It', () => {
     });
   });
 
-  describe('Part Two', () => {
-    it.only('should find if of non-overlapping claim', () => {
+  describe.only('Part Two', () => {
+    it('should find if of non-overlapping claim', () => {
       const claims =
         `#1 @ 1,3: 4x4
          #2 @ 3,1: 4x4
@@ -33,7 +33,7 @@ describe('Day 3: No Matter How You Slice It', () => {
 
     it('Input file should return', () => {
       const input = fs.readFileSync('day-03-no-matter-how-you-slice-it/input.txt').toString();
-      expect(fabric.findGoodClaim(input)).to.equal(3);
+      expect(fabric.findGoodClaim(input)).to.equal(1100);
     });
   });
 });

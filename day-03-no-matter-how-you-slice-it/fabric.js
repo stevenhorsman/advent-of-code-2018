@@ -30,7 +30,34 @@ function findGoodClaim(input) {
       return {id:+result[1], x:+result[2], y:+result[3],width:+result[4],height:+result[5]}
     });
 
-    return 0;
+    
+
+    for (let i = 0; i < claims.length; i++) {
+      overlap = false;
+      for (let j = 0; j < claims.length; j++) {
+        if (i === j) {
+          continue;
+        }
+        if (isOverlap(claims[i],claims[j])) {
+          overlap = true;
+          break;
+        }
+      }
+      if (!overlap) {
+        return claims[i].id
+      }
+    }
+}
+
+//TODO - refactor
+function isOverlap(claimsA, claimsB) {
+  if ((claimsA.x < claimsB.x + claimsB.width) && (claimsA.x + claimsA.width > claimsB.x)) {
+    //horozontal overlap
+    if ((claimsA.y < claimsB.y + claimsB.height) && (claimsA.y + claimsA.height > claimsB.y)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 module.exports.calculateOverlap = calculateOverlap;
