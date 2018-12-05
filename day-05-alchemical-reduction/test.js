@@ -34,12 +34,12 @@ describe('Day 5: Alchemical Reduction', () => {
 
   describe('Part Two', () => {
     it('should calculate polymer from dabAcCaCBAcCcaDA', () => {
-      expect(polymer.calculateReductionLengthWithRemoval('dabAcCaCBAcCcaDA')).to.equal(4);;
+      expect(polymer.calculateReductionLengthWithRemoval('dabAcCaCBAcCcaDA')).to.equal(4);
     });
 
     it('Input file should return', () => {
       const input = fs.readFileSync('day-05-alchemical-reduction/input.txt').toString();
       expect(polymer.calculateReductionLengthWithRemoval(input)).to.equal(5278);
-    });
+    }).timeout(5000);
   });
 });
