@@ -3,9 +3,9 @@ const fs = require('fs');
 
 const coordinates = require('./coordinates');
 
-describe('Day 5: Alchemical Reduction', () => {
+describe('Day 6: Chronal Coordinates', () => {
     
-  describe.only('Part One', () => {
+  describe('Part One', () => {
     it('should calculate largest area', () => {
       const coords =
       `1, 1
@@ -23,7 +23,7 @@ describe('Day 5: Alchemical Reduction', () => {
     });
   });
 
-  describe.only('Part Two', () => {
+  describe('Part Two', () => {
     it('should calculate largest area', () => {
       const coords =
       `1, 1
