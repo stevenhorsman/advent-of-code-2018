@@ -5,7 +5,7 @@ const sleighKit = require('./sleighKit');
 
 describe('Day 7: The Sum of Its Parts', () => {
     
-  describe.only('Part One', () => {
+  describe('Part One', () => {
     it('should determine order of steps', () => {
       const instructions =
       `Step C must be finished before step A can begin.
@@ -18,14 +18,14 @@ describe('Day 7: The Sum of Its Parts', () => {
       expect(sleighKit.calculateOrder(instructions)).to.equal('CABDFE');
     });
 
-    it.only('Input file should return', () => {
+    it('Input file should return', () => {
       const input = fs.readFileSync('day-07-the-sum-of-its-parts/input.txt').toString();
       expect(sleighKit.calculateOrder(input)).to.equal('LFMNJRTQVZCHIABKPXYEUGWDSO');
     });
   });
 
   describe('Part Two', () => {
-    it.only('should determine work duration', () => {
+    it('should determine work duration', () => {
       const instructions =
       `Step C must be finished before step A can begin.
        Step C must be finished before step F can begin.
@@ -37,7 +37,7 @@ describe('Day 7: The Sum of Its Parts', () => {
       expect(sleighKit.calculateTime(instructions,2,0)).to.equal(15);
     });
 
-    it.only('Input file should return', () => {
+    it('Input file should return', () => {
       const input = fs.readFileSync('day-07-the-sum-of-its-parts/input.txt').toString();
       expect(sleighKit.calculateTime(input,5,60)).to.equal(1180);
     });
