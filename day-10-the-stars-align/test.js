@@ -6,7 +6,7 @@ const stars = require('./stars');
 describe('Day 10: The Stars Align', () => {
     
   describe('Part One', () => {
-    it.only('should calculate message in the stars after 3 iterations', () => {
+    it('should calculate message in the stars after 3 iterations', () => {
       const input = 
         `position=< 9,  1> velocity=< 0,  2>
         position=< 7,  0> velocity=<-1,  0>
@@ -39,16 +39,12 @@ describe('Day 10: The Stars Align', () => {
         position=< 5,  9> velocity=< 1, -2>
         position=<14,  7> velocity=<-2,  0>
         position=<-3,  6> velocity=< 2, -1>`;
-      expect(stars.modelStars(input)).to.equal(32);
+      stars.modelStars(input,3);
     });
 
-    it.skip('Input file should return', () => {
+    it('Input file should return', () => {
       const input = fs.readFileSync('day-10-the-stars-align/input.txt').toString();
-      expect(stars.modelStars(input)).to.equal(373597);
+      stars.modelStars(input,12000);
     });
-  });
-
-  describe('Part Two', () => {
-   
   });
 });

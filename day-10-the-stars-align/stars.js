@@ -7,7 +7,7 @@ class MovingPoint {
   }
 }
 
-function modelStars(input) {
+function modelStars(input, maxIters) {
 
   let stars = [];
 
@@ -17,14 +17,53 @@ function modelStars(input) {
     stars.push(new MovingPoint(+result[1], +result[2], +result[3], +result[4]));
   });
 
-  for(let i = 0; i <= 3; i++) {
+
+
+  for(let i = 0; i <= maxIters; i++) {
     stars.map((star) => {
-      star.px += star.xVel;
-      star.py += star.yVel;
+      star.x += star.xVel;
+      star.y += star.yVel;
     });
+
+    const sortX = stars
+      .map(p => p.x)
+      .sort((a, b) => b - a);
+    const minX = sortX[sortX.length-1];
+    const maxX = sortX[0];
+
+    const sortY = stars
+      .map(p => p.y)
+      .sort((a, b) => b - a);
+    const minY = sortY[sortY.length-1];
+    const maxY = sortY[0];
+
+    //console.log(i, stars);
+    //console.log(i, '(',minX,minY,'),(',maxX,maxY,')');
+    if (maxY - minY <= 9 && maxX - minX < 100) {
+      //Might be a good guess
+      console.log("At iteration",i+1);
+      drawStars(stars, minX, maxX, minY, maxY);
+    }
   }
+}
 
+function drawStars(stars, minX, maxX, minY, maxY) {
 
+  let starVals = {};
+  stars.map((star) => starVals[`${star.x},${star.y}`]=1);
+
+  for (let y = minY; y <= maxY; y++) {
+    const line = [];
+    for (let x = minX; x <= maxX; x++) {
+      if (starVals[`${x},${y}`] == 1) {
+        line.push('#');
+      }
+      else {
+        line.push('.');
+      }
+    }
+    console.log(line.join(''));
+  }
 }
 
 module.exports.modelStars = modelStars;
