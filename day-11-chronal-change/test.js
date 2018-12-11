@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 
 const fuelcells = require('./fuelcells');
 
-describe('Day 11: Chronal Charge', () => {
+describe.only('Day 11: Chronal Charge', () => {
     
   describe('Calculate fuel cell value', () => {
     it('fuel cell at 3,5 in a grid with serial number 8', () => {
@@ -30,9 +30,11 @@ describe('Day 11: Chronal Charge', () => {
   describe('Part One', () => {
     // it('print grid 33,45, serial 18', () => {
     //   let serial = 18;
-    //   for(let y = 45;y<45+3;y++) {
+    //   let xStart = 1;
+    //   let yStart = 1;
+    //   for(let y = yStart;y<yStart+3;y++) {
     //     let row = [];
-    //     for(let x = 33;x<33+3;x++) {
+    //     for(let x = xStart;x<xStart+3;x++) {
     //       row.push(fuelcells.calculateFuelCellValue(serial, x, y));
     //     }
     //     console.log(row.join(' '));
@@ -52,17 +54,17 @@ describe('Day 11: Chronal Charge', () => {
     });
   });
 
-  describe.only('Part Two', () => {
+  describe('Part Two', () => {    
     it('should get x,y of largest total power for serial number 18', () => {
-      expect(fuelcells.calculateMaxFuelGrid(18)).to.equal('90,269,16');
+      expect(fuelcells.calculateMaxFuelSum(18)).to.equal('90,269,16');
     }).timeout(500000);
 
     it('should get x,y of largest total power for serial number 42', () => {
-      expect(fuelcells.calculateMaxFuelGrid(42)).to.equal('232,251,12');
+      expect(fuelcells.calculateMaxFuelSum(42)).to.equal('232,251,12');
     }).timeout(500000);
 
     it('should get x,y of largest total power for serial number 2187', () => {
-      expect(fuelcells.calculateMaxFuelGrid(2187)).to.equal('233,40,13');
+      expect(fuelcells.calculateMaxFuelSum(2187)).to.equal('233,40,13');
     }).timeout(500000);
   });
 });
