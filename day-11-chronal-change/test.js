@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 
 const fuelcells = require('./fuelcells');
 
-describe.only('Day 11: Chronal Charge', () => {
+describe('Day 11: Chronal Charge', () => {
     
   describe('Calculate fuel cell value', () => {
     it('fuel cell at 3,5 in a grid with serial number 8', () => {
