@@ -15,5 +15,8 @@
     "eslint-config-airbnb-base": "",
     "eslint-plugin-import": "",
     "mocha": ""
+  },
+  "dependencies": {
+    "enumify": "^1.0.4"
   }
 }
