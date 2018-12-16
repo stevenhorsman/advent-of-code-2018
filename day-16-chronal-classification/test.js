@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const assembly = require('./assembly');
 
-describe.only('Day 16: Chronal Classification', () => {
+describe('Day 16: Chronal Classification', () => {
 
   describe('Test instructions all work', () => {
     it('should run addr op correctly', () => {
