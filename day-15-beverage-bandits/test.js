@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const fs = require('fs');
 
 const combat = require('./combat');
+const d15 = require('./d15');
 
 describe.only('Day 15: Beverage Bandits', () => {
     
@@ -80,9 +81,14 @@ describe.only('Day 15: Beverage Bandits', () => {
       expect(combat.game(input)).to.equal(18740);
     }).timeout(20000);
 
-    it('Input file should return after 20 iterations', () => {
+    it.only('Input file should return after 20 iterations', () => {
       const input = fs.readFileSync('day-15-beverage-bandits/input.txt').toString();
-      expect(combat.game(input)).to.equal(0);
+      expect(combat.game(input)).to.equal(248848);
+    }).timeout(2000000);
+
+    it.only('Input file should return after 20 iterations', () => {
+      const input = fs.readFileSync('day-15-beverage-bandits/input.txt').toString();
+      expect(d15.programReadLine(input)).to.equal(0);
     }).timeout(2000000);
   });
 

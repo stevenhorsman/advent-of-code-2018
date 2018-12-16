@@ -50,7 +50,6 @@ class Map {
     for (let y = 0; y < mapCopy.length; y++) {
       console.log(mapCopy[y].map(object => object.symbol).join(''));
     }
-    console.log('');
   }
 
   getGrid(x, y) {
@@ -85,7 +84,7 @@ class Player {
   getEnemyInAttackRange() {
     return this.getEnemies()
       .filter(enemy => this.calculateManhattenDistance(enemy) === 1)
-      .sort((a, b) => a.hitPoints - b.hitPoints)[0];
+      .sort((a, b) => a.hitPoints - b.hitPoints || a.y - b.y || a.x - b.x)[0];
   }
   
   getEnemies() {
@@ -97,25 +96,32 @@ class Player {
   }
 
   move() {
-    let inRange = new Set(this.getEnemies().map(player => getAdjacentAvailableSpace(player.x, player.y))
-      .reduce((acc, spaces) => acc.concat(...spaces),[]));
-    let targets = {};
-    inRange.forEach(position => {
-      targets[`${position.x},${position.y}`] = undefined;
-    });
-    //console.log('inRange',inRange);
-    //Find out which paths we can get to
+  // let inRange = new Set(this.getEnemies().map(player => getAdjacentAvailableSpace(player.x, player.y))
+  //   .reduce((acc, spaces) => acc.concat(...spaces),[]));
+  // let targets = {};
+  // inRange.forEach(position => {
+  //   targets[`${position.x},${position.y}`] = undefined;
+  // });
+  // //console.log('inRange',inRange);
+  // //Find out which paths we can get to
 
-    //console.log('targets',targets);
-    getPaths(targets, new Set(), this.x,this.y, []);
+  // //console.log('targets',targets);
+  // getPaths(targets, new Set(), this.x,this.y, []);
 
-    let orderedTargets = Object.values(targets).filter(x => x).map(array => array.slice(1)).sort((a,b) => a.length - b.length || a[0].y - b[0].y || a[0].x - b[0].x);
-    //console.log('orderedTargets',orderedTargets);
-    if (orderedTargets.length > 0) {
-      const nextMove = orderedTargets[0][0];
+  // let orderedTargets = Object.values(targets).filter(x => x).map(array => array.slice(1)).sort((a,b) => a.length - b.length || a[0].y - b[0].y || a[0].x - b[0].x);
+    let altMove = findNextMovement(this);
+    // if (orderedTargets.length > 0) {
+    //   if (orderedTargets[0][0].x != altMove.x || orderedTargets[0][0].y != altMove.y) {
+    //     console.log('orderedTargets',orderedTargets[0][0], altMove);
+    //   }
+    //   const nextMove = orderedTargets[0][0];
+    if (altMove != null) {
+      let nextMove = altMove;
       //console.log('next move',orderedTargets[0][0]);
       this.x = nextMove.x;
       this.y = nextMove.y;
+    } else if(altMove != null) {
+      console.log('>>>>>>>>>no ordered targets:',altMove);
     }
   }
 }
@@ -140,6 +146,56 @@ function getPaths(targets, seen, x, y, pathSoFar) {
   });
 }
 
+//copied from https://github.com/albertobastos/advent-of-code-2018-nodejs/blob/master/src/d15.js - same result as mine, but much much faster
+function findNextMovement(player) {
+  let targetKeys = {}; // "x,y" ==> { x, y } of alive enemy
+  player.getEnemies()
+    .map(p => getAdjacentAvailableSpace(p.x, p.y))
+    .reduce((acc, list) => acc.concat(...list), [])
+    .forEach(pos => (targetKeys[`${pos.x},${pos.y}`] = pos));
+
+  let visited = {};
+  visited[`${player.x},${player.y}`] = true;
+
+  let paths = [[{x: player.x,y:player.y}]];
+  while (true) {
+    let newPaths = [];
+    let targetPaths = [];
+    paths.forEach(path => {
+      let adjacents = getAdjacentAvailableSpace(path[path.length - 1].x, path[path.length - 1].y);
+      adjacents.forEach(adj => {
+        let xy = `${adj.x},${adj.y}`;
+        if (targetKeys[xy]) {
+          // found a path to a target!
+          // add it so at the end of the iteration we chose the right one based on enemy order
+          targetPaths.push([...path, adj, targetKeys[xy]]);
+        } else if (!visited[xy]) {
+          // new extended path to explore at next iteration
+          newPaths.push([...path, adj]);
+        }
+        visited[xy] = true; // mark as visited so other paths ignore it
+      });
+    });
+
+    if (targetPaths.length > 0) {
+      // we got one or more paths reaching a target for the first time, here is where our search ends
+      // if we found multiple shortest paths, use the one that reaches the first target according top-to-bottom/left-to-right order
+      targetPaths = targetPaths.sort((p1, p2) =>
+        p1[p1.length - 1].y === p2[p2.length - 1].y
+          ? p1[p1.length - 1].x - p2[p2.length - 1].x
+          : p1[p1.length - 1].y - p2[p2.length - 1].y
+      );
+
+      // return the first step to take for the shortest path ([0] is the player current position)
+      return targetPaths[0][1];
+    }
+
+    // no paths to a target found yet, keep iterating with the paths after one more step
+    paths = newPaths;
+    if (paths.length < 1) return null; // no reachables targets, search ends without a result
+  }
+}
+
 class Elf extends Player {
   constructor(x, y) {
     super(x, y);
@@ -161,16 +217,17 @@ function game(input) {
   //map.print();
   let finished = false;
   let rounds = 0;
-  while (!finished && rounds < 50) {
+  while (!finished) {
     rounds++;
     finished = round();
     //console.log('finished', finished);
     //check if either side is completed.
     //finished = new Goblin(0,0).getEnemies().length == 0 || new Elf(0,0).getEnemies().length == 0;
-    if (rounds % 20 == 0) {
+    if (rounds % 1 == 0) {
       console.log('After',rounds,'rounds');
       map.print();
-      console.log(map.alivePlayers);
+      console.log(map.alivePlayers.sort((a, b) => a.y - b.y || a.x - b.x).map(player => `${player.symbol} ${player.x} ${player.y} ${player.hitPoints}`).join("\n"));
+      console.log('');
     }
   }
   let hpSum = map.alivePlayers.map(player => player.hitPoints).reduce((acc, curr) => acc + curr, 0);
