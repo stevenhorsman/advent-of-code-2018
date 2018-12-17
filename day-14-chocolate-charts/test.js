@@ -18,10 +18,6 @@ describe('Day 14: Chocolate Charts', () => {
         expect(recipes.getScore(test.arg)).to.equal(test.expected);
       }).timeout(500000);
     });
-
-    it.skip('After 293801 recipes, score should be', () => {
-      expect(recipes.getScore(293801)).to.equal('3147574107');
-    });
   });
 
   describe('Part One - Arrays', () => {

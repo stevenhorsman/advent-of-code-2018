@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const combat = require('./combat');
 
-describe.only('Day 15: Beverage Bandits', () => {
+describe('Day 15: Beverage Bandits', () => {
 
   describe('Part One', () => {
     it('should calculate combat end state 27730', () => {
@@ -16,18 +16,6 @@ describe.only('Day 15: Beverage Bandits', () => {
       #.....#
       #######`;
       expect(combat.game(input, false, 50)).to.equal(27730);
-    });
-
-    it.skip('should calculate combat end state 27730', () => {
-      const input =
-        `#######
-        #..G..#
-        #...G.#
-        #.#G#G#
-        #...#E#
-        #.....#
-        #######`;
-      expect(combat.game(input,false,1)).to.equal(27730);
     });
 
     it('should calculate combat end state 36334', () => {
