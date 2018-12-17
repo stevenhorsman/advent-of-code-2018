@@ -3,6 +3,8 @@ const enumify = require('enumify');
 
 class MapObject extends enumify.Enum {}
 
+const DEFAULT_POWER = 3;
+
 MapObject.initEnum({
   WALL: {
     get available() { return false; },
@@ -63,6 +65,10 @@ class Map {
   get alivePlayers() {
     return this.players.filter(player => player.isAlive);
   }
+
+  getElves() {
+    return this.players.filter(p => p.symbol == 'E');
+  }
 }
 
 class Player {
@@ -96,109 +102,72 @@ class Player {
   }
 
   move() {
-  // let inRange = new Set(this.getEnemies().map(player => getAdjacentAvailableSpace(player.x, player.y))
-  //   .reduce((acc, spaces) => acc.concat(...spaces),[]));
-  // let targets = {};
-  // inRange.forEach(position => {
-  //   targets[`${position.x},${position.y}`] = undefined;
-  // });
-  // //console.log('inRange',inRange);
-  // //Find out which paths we can get to
-
-  // //console.log('targets',targets);
-  // getPaths(targets, new Set(), this.x,this.y, []);
-
-  // let orderedTargets = Object.values(targets).filter(x => x).map(array => array.slice(1)).sort((a,b) => a.length - b.length || a[0].y - b[0].y || a[0].x - b[0].x);
-    let altMove = findNextMovement(this);
-    // if (orderedTargets.length > 0) {
-    //   if (orderedTargets[0][0].x != altMove.x || orderedTargets[0][0].y != altMove.y) {
-    //     console.log('orderedTargets',orderedTargets[0][0], altMove);
-    //   }
-    //   const nextMove = orderedTargets[0][0];
-    if (altMove != null) {
-      let nextMove = altMove;
-      //console.log('next move',orderedTargets[0][0]);
+  let inRange = new Set(this.getEnemies().map(player => getAdjacentAvailableSpace(player.x, player.y))
+    .reduce((acc, spaces) => acc.concat(...spaces),[]));
+  let targets = {};//Change to set
+  inRange.forEach(position => {
+    targets[`${position.x},${position.y}`] = undefined;
+  });
+ 
+    let nextMove = findPaths(targets, this.x, this.y);
+    
+    if (nextMove != null) {
       this.x = nextMove.x;
       this.y = nextMove.y;
-    } else if(altMove != null) {
-      console.log('>>>>>>>>>no ordered targets:',altMove);
     }
   }
 }
 
-function getPaths(targets, seen, x, y, pathSoFar) {
-  if (pathSoFar.length > 100) return;
-  let curr =`${x},${y}`;
-  seen.add(curr);
-  pathSoFar.push({x:x,y:y});
-  if (Object.keys(targets).includes(curr)) {
-    if (!targets[curr] || pathSoFar.length < targets[curr].length) {
-      targets[curr] = pathSoFar.slice();
-      //console.log('found better target', curr, 'path', pathSoFar/*, targets*/);
-    }
-  }
-  //console.log('Now at', curr, /*Object.keys(targets).includes(curr), 'targets',targets,*/ pathSoFar/*, seen*/);
-  let newAdj = getAdjacentAvailableSpace(x, y).filter(pos => !seen.has(`${pos.x},${pos.y}`));
-  //console.log(curr,':newAdj', newAdj);
-  newAdj.forEach(pos => {
-    //console.log(curr,'about to visit',pos);
-    getPaths(targets, new Set(seen), pos.x, pos.y, pathSoFar.slice());
-  });
-}
-
-//copied from https://github.com/albertobastos/advent-of-code-2018-nodejs/blob/master/src/d15.js - same result as mine, but much much faster
-function findNextMovement(player) {
-  let targetKeys = {}; // "x,y" ==> { x, y } of alive enemy
-  player.getEnemies()
-    .map(p => getAdjacentAvailableSpace(p.x, p.y))
-    .reduce((acc, list) => acc.concat(...list), [])
-    .forEach(pos => (targetKeys[`${pos.x},${pos.y}`] = pos));
-
+//Algo from https://www.geeksforgeeks.org/shortest-path-unweighted-graph/
+function findPaths(targets, x, y) {
+  let queue = [];
+  let dist = {};
+  let pred = {};
   let visited = {};
-  visited[`${player.x},${player.y}`] = true;
 
-  let paths = [[{x: player.x,y:player.y}]];
-  while (true) {
-    let newPaths = [];
-    let targetPaths = [];
-    paths.forEach(path => {
-      let adjacents = getAdjacentAvailableSpace(path[path.length - 1].x, path[path.length - 1].y);
-      adjacents.forEach(adj => {
-        let xy = `${adj.x},${adj.y}`;
-        if (targetKeys[xy]) {
-          // found a path to a target!
-          // add it so at the end of the iteration we chose the right one based on enemy order
-          targetPaths.push([...path, adj, targetKeys[xy]]);
-        } else if (!visited[xy]) {
-          // new extended path to explore at next iteration
-          newPaths.push([...path, adj]);
+  let posString = `${x},${y}`;
+  visited[posString] = true;
+  dist[posString] = 0;
+  queue.push({x:x, y:y});
+
+  while(queue.length > 0) {
+    let position = queue.shift();
+    let predString = `${position.x},${position.y}`;
+    
+    getAdjacentAvailableSpace(position.x, position.y).forEach(adj => {
+      let posString = `${adj.x},${adj.y}`;
+      if (visited[posString] !== true) {
+        visited[posString] = true;
+        dist[posString] = dist[predString] + 1;
+        pred[posString] = predString;
+        queue.push({x:adj.x, y:adj.y});
+
+        if (Object.keys(targets).filter(target => visited[target] !== true).length == 0) {
+          return true;
         }
-        visited[xy] = true; // mark as visited so other paths ignore it
-      });
+      }
     });
-
-    if (targetPaths.length > 0) {
-      // we got one or more paths reaching a target for the first time, here is where our search ends
-      // if we found multiple shortest paths, use the one that reaches the first target according top-to-bottom/left-to-right order
-      targetPaths = targetPaths.sort((p1, p2) =>
-        p1[p1.length - 1].y === p2[p2.length - 1].y
-          ? p1[p1.length - 1].x - p2[p2.length - 1].x
-          : p1[p1.length - 1].y - p2[p2.length - 1].y
-      );
-
-      // return the first step to take for the shortest path ([0] is the player current position)
-      return targetPaths[0][1];
-    }
-
-    // no paths to a target found yet, keep iterating with the paths after one more step
-    paths = newPaths;
-    if (paths.length < 1) return null; // no reachables targets, search ends without a result
   }
+  let orderedTargets = Object.keys(targets).filter(target => dist[target] != undefined).sort((a,b) => {
+    return dist[a] - dist[b] || a.split(',')[1] - b.split(',')[1] || a.split(',')[0] - b.split(',')[0];
+  });
+  if (orderedTargets.length == 0) {
+    return null;
+  }
+
+  let crawl = orderedTargets[0];
+  let prevStep;
+  while (pred[crawl] && crawl != `${x},${y}`) {
+    prevStep = crawl; 
+    crawl = pred[crawl]; 
+  }
+  return {x:+prevStep.split(',')[0], y:+prevStep.split(',')[1]};
 }
 
 class Elf extends Player {
   constructor(x, y) {
     super(x, y);
+    this.power=elfAttackPower;
   }
   get symbol() {return 'E'; }
 }
@@ -212,28 +181,30 @@ class Goblin extends Player {
 }
 
 let map;
-function game(input) {
-  map = new Map(input);
-  //map.print();
-  let finished = false;
-  let rounds = 0;
-  while (!finished) {
-    rounds++;
-    finished = round();
-    //console.log('finished', finished);
-    //check if either side is completed.
-    //finished = new Goblin(0,0).getEnemies().length == 0 || new Elf(0,0).getEnemies().length == 0;
-    if (rounds % 1 == 0) {
-      console.log('After',rounds,'rounds');
-      map.print();
-      console.log(map.alivePlayers.sort((a, b) => a.y - b.y || a.x - b.x).map(player => `${player.symbol} ${player.x} ${player.y} ${player.hitPoints}`).join("\n"));
-      console.log('');
-    }
+let elfAttackPower = DEFAULT_POWER;
+function game(input,noElfDies=false, roundCap = 9999999) {
+  elfAttackPower = DEFAULT_POWER;
+  let rounds = playGame(input,roundCap);
+  while (noElfDies && map.getElves().filter(player => !player.isAlive).length > 0) {
+    elfAttackPower++;
+    rounds = playGame(input,roundCap);
   }
+  
   let hpSum = map.alivePlayers.map(player => player.hitPoints).reduce((acc, curr) => acc + curr, 0);
   rounds--;
-  console.log('rounds', rounds,'sum',hpSum);
+  console.log('elfPower',elfAttackPower,'rounds', rounds,'sum',hpSum);
   return hpSum * rounds;
+}
+
+function playGame(input,roundCap) {
+  map = new Map(input);
+  let finished = false;
+  let rounds = 0;
+  while (!(finished || rounds >= roundCap)) {
+    rounds++;
+    finished = round();
+  }
+  return rounds;
 }
 
 function round() {
@@ -260,26 +231,17 @@ function round() {
 
 function getAdjacentAvailableSpace(x, y) {
   const adjacents = [
-    { x: x, y: y - 1 },
-    { x: x - 1, y: y },
-    { x: x + 1, y: y },
-    { x: x, y: y + 1 }
+    { x: +x, y: +y - 1 },
+    { x: +x - 1, y: +y },
+    { x: +x + 1, y: +y },
+    { x: +x, y: +y + 1 }
   ];
+
   return adjacents
     .filter(position => map.getGrid(position.x, position.y) == MapObject.EMPTY) //No wall
-    .filter(position => !map.alivePlayers.some(player => {
-      return player.x === position.x && player.y === position.y;
-    })); //NO players
-}
-
-function getPlayer1InRange(input) {
-  map = new Map(input);
-  map.print();
-  let player1 = map.alivePlayers.sort((a, b) => a.y - b.y || a.x - b.x)[0];
-  console.log('player1',player1);
-  player1.move();
-  map.print();
+    .filter(position => !map.alivePlayers.some(player => 
+      player.x == position.x && player.y == position.y
+    )); //NO players
 }
 
 module.exports.game = game;
-module.exports.getPlayer1InRange = getPlayer1InRange;
