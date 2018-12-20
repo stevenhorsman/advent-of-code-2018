@@ -1,113 +1,130 @@
-class Opcode {
-  constructor(name, runFunction) {
-    this.name = name;
-    this.runFunction = runFunction;
+const enumify = require('enumify');
+
+class Direction extends enumify.Enum { }
+
+Direction.initEnum({
+  NORTH: {
+    get reverse() { return Direction.SOUTH; },
+    get symbol() { return 'N'; }
+  },
+  EAST: {
+    get reverse() { return Direction.WEST; },
+    get symbol() { return 'E'; }
+  },
+  SOUTH: {
+    get reverse() { return Direction.NORTH; },
+    get symbol() { return 'S'; }
+  },
+  WEST: {
+    get reverse() { return Direction.EAST; },
+    get symbol() { return 'W'; }
   }
-
-  run(input1, input2, output, registers) {
-    registers[output] = this.runFunction(input1, input2, registers);
-  }
-}
-
-const opcodes = {};
-addOpCode('addr', (a, b, registers) => {
-  return registers[a] + registers[b];
-});
-addOpCode('addi', (a, b, registers) => {
-  return registers[a] + b;
-});
-addOpCode('mulr', (a, b, registers) => {
-  return registers[a] * registers[b];
-});
-addOpCode('muli', (a, b, registers) => {
-  return registers[a] * b;
-});
-addOpCode('banr', (a, b, registers) => {
-  return registers[a] & registers[b];
-});
-addOpCode('bani', (a, b, registers) => {
-  return registers[a] & b;
-});
-addOpCode('borr', (a, b, registers) => {
-  return registers[a] | registers[b];
-});
-addOpCode('bori', (a, b, registers) => {
-  return registers[a] | b;
-});
-addOpCode('setr', (a, b, registers) => {
-  return registers[a];
-});
-addOpCode('seti', (a) => {
-  return a;
 });
 
-addOpCode('gtir', (a, b, registers) => {
-  return a > registers[b] ? 1 : 0;
-});
-addOpCode('gtri', (a, b, registers) => {
-  return registers[a] > b ? 1 : 0;
-});
-addOpCode('gtrr', (a, b, registers) => {
-  return registers[a] > registers[b] ? 1 : 0;
-});
-
-addOpCode('eqir', (a, b, registers) => {
-  return a === registers[b] ? 1 : 0;
-});
-addOpCode('eqri', (a, b, registers) => {
-  return registers[a] === b ? 1 : 0;
-});
-addOpCode('eqrr', (a, b, registers) => {
-  return registers[a] === registers[b] ? 1 : 0;
-});
-
-function addOpCode(name, op) {
-  opcodes[name] = new Opcode(name, op);
-}
-
-function runInstruction(input) {
-  let inputLines = input.split(/\r?\n/).map((line) => line.trim());
-  let registers = setUpRegisters(inputLines.shift());
-  let instruction = inputLines.shift().split(' ');
-  opcodes[instruction[0]].run(+instruction[1],+instruction[2],+instruction[3], registers);
-  return registers;
-}
-
-function setUpRegisters(line) {
-  const parse = line.replace(/ /g,'').match(/(.+):\[(.+)\]/);
-  return parse[2].split(',').map(Number);
-}
-
-//help from https://www.reddit.com/r/adventofcode/comments/a7j9zc/2018_day_19_solutions/ec3l7ls/
-function executeProgram(input, register0Value = 0) {
-  let inputLines = input.split(/\r?\n/).map((line) => line.trim());
-  let result = inputLines.shift().match(/#ip (\d+)/);
-  const ipBind = result[1];
-  console.log('IP bound to ',ipBind);
-  let registers = [register0Value,0,0,0,0,0];
-  let ip = registers[ipBind];
-  //console.log('ip='+ip,registers.slice(), inputLines[ip]);
-  while(ip >= 0 && ip < inputLines.length) {
-    let instruction = inputLines[ip].split(' ');
-        //OPTIMISER
-    if (ip == 2 && registers[1] != 0) {
-      //console.log('>>>>>in optimizer');
-      if ((registers[4] % registers[1])==0){
-        registers[0] += registers[1];
-      }
-      registers[5] = 0;
-      registers[3] = registers[4];
-      ip=12;
-      continue;
+function parseDirection(char) {
+  for (const d of Direction.enumValues) {
+    if (d.symbol === char) {
+      return d;
     }
-
-    opcodes[instruction[0]].run(+instruction[1],+instruction[2],+instruction[3], registers);
-    //console.log('res',registers);
-    registers[ipBind]++;
-    ip = registers[ipBind];
   }
-  return registers[0];
 }
 
-module.exports.runInstruction = runInstruction;
-module.exports.executeProgram = executeProgram;
+class Room {
+  constructor(id) {
+    //console.log('Create room', id);
+    this.id = id;
+    this.connections = {};
+  }
+
+  addDoor(adjacent, direction) {
+    this.connections[direction] = adjacent;
+    let opposite = adjacent.getRoom(direction.reverse);
+    if (!opposite) {
+      adjacent.addDoor(this, direction.reverse);
+    } else {
+      if (opposite != this) {
+        console.log('>>>>>>>>>>>>>>>error!');
+      }
+    }
+  }
+
+  getRoom(direction) {
+    return this.connections[direction];
+  }
+
+  getConnections() {
+    return Object.values(this.connections);
+  }
+}
+
+function getDistances(room) {
+  let queue = [];
+  let dist = {};
+  let pred = {};
+  let visited = {};
+
+  visited[room.id] = true;
+  dist[room.id] = 0;
+  queue.push(room);
+
+  while (queue.length > 0) {
+    let room = queue.shift();
+
+    room.getConnections().forEach(adj => {
+      if (visited[adj.id] !== true) {
+        visited[adj.id] = true;
+        dist[adj.id] = dist[room.id] + 1;
+        pred[adj.id] = room.id;
+        queue.push(adj);
+      }
+    });
+  }
+  return Object.values(dist).sort((a, b) => b - a);
+}
+
+function constructMap(routeString) {
+  let roomNo = 0;
+  let startRoom = new Room(roomNo++);
+  let latestRoom = startRoom;
+  let stack = [];
+  let chars = routeString.trim().substr(1).slice(0, -1).split('');
+  chars.forEach(c => {
+    switch (c) {
+      case '(':
+        stack.push(latestRoom);
+        break;
+      case ')':
+        latestRoom = stack.pop();
+        break;
+      case '|':
+        latestRoom = stack[stack.length - 1];
+        break;
+      default: {
+        const dir = parseDirection(c);
+        if (dir) {
+          let room = latestRoom.getRoom(dir);
+          if (!room) {
+            room = new Room(roomNo++);
+            //console.log(latestRoom, 'adding door room', room, 'to the', dir.name);
+            latestRoom.addDoor(room, dir);
+          }
+          latestRoom = room;
+        }
+      }
+    }
+  });
+  return startRoom;
+}
+
+function findFurthestRoom(routeString) {
+  const startRoom = constructMap(routeString);
+  return getDistances(startRoom)[0];
+}
+
+function findRoomsFarAway(routeString,distance = 1000) {
+  const startRoom = constructMap(routeString);
+  return getDistances(startRoom).filter(d => d >= distance).length;
+}
+
+module.exports.findFurthestRoom = findFurthestRoom;
+module.exports.findRoomsFarAway = findRoomsFarAway;
