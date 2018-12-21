@@ -3,50 +3,46 @@ const fs = require('fs');
 
 const map = require('./map');
 
-describe.only('Day 20: A Regular Map', () => {
+describe('Day 20: A Regular Map', () => {
 
   describe('Part One', () => {
     it('execute sample program and return reg 0', () => {
-      const expected = 
-     `#####
-      #.|.#
-      #-###
-      #.|X#
-      #####`;
+    // #####
+    // #.|.#
+    // #-###
+    // #.|X#
+    // #####
       expect(map.findFurthestRoom('^WNE$')).to.equal(3);
     });
 
     it('execute sample program and return reg 0', () => {
-      const expected = 
-    `#?#?#?#?#
-     ?.|.|.|.?
-     #?#?#?#-#
-         ?X|.?
-         #?#?#`;
+    // #?#?#?#?#
+    // ?.|.|.|.?
+    // #?#?#?#-#
+    //     ?X|.?
+    //     #?#?#
       expect(map.findFurthestRoom('^ENWWW$')).to.equal(5);
     });
 
     it('execute sample program and return reg 0', () => {
-      const expected = 
-    `#?#?#?#?#
-     ?.|.|.|.?
-     #-#?#?#?#
-     ?.|.|.|.?
-     #?#?#?#-#
-         ?X|.?
-         #?#?#`;
+    // #?#?#?#?#
+    // ?.|.|.|.?
+    // #-#?#?#?#
+    // ?.|.|.|.?
+    // #?#?#?#-#
+    //     ?X|.?
+    //     #?#?#
       expect(map.findFurthestRoom('^ENWWW(NEEE)$')).to.equal(9);
     });
 
     it('execute sample program and return reg 0', () => {
-      const expected = 
-    `#?#
-     ?.?
-     #-#?#?#?#
-     ?.|.|.|.?
-     #?#?#?#-#
-     #.|.?X|.?
-     #?#?#?#?#`;
+    // #?#
+    // ?.?
+    // #-#?#?#?#
+    // ?.|.|.|.?
+    // #?#?#?#-#
+    // #.|.?X|.?
+    // #?#?#?#?#
       expect(map.findFurthestRoom('^ENWWW(N|SE)$')).to.equal(7);
     });
 
