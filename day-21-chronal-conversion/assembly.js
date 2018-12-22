@@ -79,8 +79,12 @@ function setUpRegisters(line) {
 }
 
 function executeProgram(input, register0Value = 0) {
-  let inputLines = input.split(/\r?\n/).map((line) => line.substring(0, line.indexOf('/')).trim());
+  let inputLines = input.split(/\r?\n/);
   let result = inputLines.shift().match(/#ip (\d+)/);
+  inputLines = inputLines.map((line) => line.substring(0, line.indexOf('/')).split(':')[1]);
+  inputLines.forEach((val, index) => console.log(index, val));
+  return 0;
+  
   const ipBind = result[1];
   console.log('IP bound to ',ipBind);
   let registers = [register0Value,0,0,0,0,0];
@@ -88,6 +92,9 @@ function executeProgram(input, register0Value = 0) {
   //console.log('ip='+ip,registers.slice(), inputLines[ip]);
   while(ip >= 0 && ip < inputLines.length) {
     let instruction = inputLines[ip].split(' ');
+    //if (instruction == 29) {
+    console.log('ip='+ip,registers.slice(), inputLines[ip], instruction);
+    //}
     //     //OPTIMISER
     // if (ip == 2 && registers[1] != 0) {
     //   //console.log('>>>>>in optimizer');
@@ -101,7 +108,9 @@ function executeProgram(input, register0Value = 0) {
     // }
 
     opcodes[instruction[0]].run(+instruction[1],+instruction[2],+instruction[3], registers);
-    //console.log('res',registers);
+    if (instruction == 29) {
+      console.log('res',registers);
+    }
     registers[ipBind]++;
     ip = registers[ipBind];
   }

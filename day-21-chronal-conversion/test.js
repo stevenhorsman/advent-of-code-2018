@@ -146,7 +146,7 @@ describe.only('Day 21: Chronal Conversion', () => {
 
   describe('Part One', () => {
     it('execute input file program and return reg 0', () => {
-      const input = fs.readFileSync('day-19-go-with-the-flow/input.txt').toString();
+      const input = fs.readFileSync('day-21-chronal-conversion/input.txt').toString();
       expect(assembly.executeProgram(input)).to.equal(1248);
     }).timeout(10000);
   });
