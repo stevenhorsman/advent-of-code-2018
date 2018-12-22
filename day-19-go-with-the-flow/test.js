@@ -167,7 +167,7 @@ describe('Day 19: Go With The Flow', () => {
   describe('Part Two', () => {
     it('execute input file program and return reg 0', () => {
       const input = fs.readFileSync('day-19-go-with-the-flow/input.txt').toString();
-      expect(assembly.executeProgram(input,1)).to.equal(1248);
-    }).timeout(10000);
+      expect(assembly.executeProgram(input,1)).to.equal(14952912);
+    }).timeout(100000);
   });
 });
