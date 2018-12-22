@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const assembly = require('./assembly');
 
-describe.only('Day 21: Chronal Conversion', () => {
+describe('Day 21: Chronal Conversion', () => {
 
   describe('Test instructions all work', () => {
     it('should run addr op correctly', () => {
@@ -147,14 +147,14 @@ describe.only('Day 21: Chronal Conversion', () => {
   describe('Part One', () => {
     it('execute input file program and return reg 0', () => {
       const input = fs.readFileSync('day-21-chronal-conversion/input.txt').toString();
-      expect(assembly.executeProgram(input)).to.equal(1248);
-    }).timeout(10000);
+      expect(assembly.part1(input)).to.equal(2884703);
+    });
   });
 
-  // describe('Part Two', () => {
-  //   it('execute input file program and return reg 0', () => {
-  //     const input = fs.readFileSync('day-19-go-with-the-flow/input.txt').toString();
-  //     expect(assembly.executeProgram(input,1)).to.equal(1248);
-  //   }).timeout(10000);
-  // });
+  describe('Part Two', () => {
+    it('execute input file program and return reg 0', () => {
+      const input = fs.readFileSync('day-21-chronal-conversion/input.txt').toString();
+      expect(assembly.part2(input)).to.equal(15400966);
+    }).timeout(10000000);
+  });
 });

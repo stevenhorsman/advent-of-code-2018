@@ -17,6 +17,7 @@
     "mocha": ""
   },
   "dependencies": {
-    "enumify": "^1.0.4"
+    "enumify": "^1.0.4",
+    "flatqueue": "^1.1.0"
   }
 }

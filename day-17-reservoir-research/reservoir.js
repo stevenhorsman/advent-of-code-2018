@@ -37,17 +37,6 @@ class Grid {
     }
   }
 
-  setGrid(func) {
-    this.grid = Array(this.height)
-      .fill()
-      .map((_, i) => Array(this.width));
-    for (let i = 0; i < this.width; i++) {
-      for (let j = 0; j < this.height; j++) {
-        this.grid[i][j] = func(i, j);
-      }
-    }
-  }
-
   set(x, y, value) {
     if (x >= 0 && x < this.grid[0].length && y >= 0 && y < this.grid.length) {
       this.grid[y][x] = value;

@@ -19,7 +19,7 @@ describe('Day 22: Mode Maze', () => {
     });
   });
 
-  describe.only('Part Two', () => {
+  describe('Part Two', () => {
 
     it('sample\'s quickest route should be 45', () => {
       const input = 

@@ -69,53 +69,107 @@ function runInstruction(input) {
   let inputLines = input.split(/\r?\n/).map((line) => line.trim());
   let registers = setUpRegisters(inputLines.shift());
   let instruction = inputLines.shift().split(' ');
-  opcodes[instruction[0]].run(+instruction[1],+instruction[2],+instruction[3], registers);
+  opcodes[instruction[0]].run(+instruction[1], +instruction[2], +instruction[3], registers);
   return registers;
 }
 
 function setUpRegisters(line) {
-  const parse = line.replace(/ /g,'').match(/(.+):\[(.+)\]/);
+  const parse = line.replace(/ /g, '').match(/(.+):\[(.+)\]/);
   return parse[2].split(',').map(Number);
 }
 
-function executeProgram(input, register0Value = 0) {
+function part1(input) {
   let inputLines = input.split(/\r?\n/);
   let result = inputLines.shift().match(/#ip (\d+)/);
-  inputLines = inputLines.map((line) => line.substring(0, line.indexOf('/')).split(':')[1]);
-  inputLines.forEach((val, index) => console.log(index, val));
-  return 0;
-  
-  const ipBind = result[1];
-  console.log('IP bound to ',ipBind);
-  let registers = [register0Value,0,0,0,0,0];
-  let ip = registers[ipBind];
-  //console.log('ip='+ip,registers.slice(), inputLines[ip]);
-  while(ip >= 0 && ip < inputLines.length) {
-    let instruction = inputLines[ip].split(' ');
-    //if (instruction == 29) {
-    console.log('ip='+ip,registers.slice(), inputLines[ip], instruction);
-    //}
-    //     //OPTIMISER
-    // if (ip == 2 && registers[1] != 0) {
-    //   //console.log('>>>>>in optimizer');
-    //   if ((registers[4] % registers[1])==0){
-    //     registers[0] += registers[1];
-    //   }
-    //   registers[5] = 0;
-    //   registers[3] = registers[4];
-    //   ip=12;
-    //   continue;
-    // }
+  inputLines = inputLines.map((line) => line.trim());
 
-    opcodes[instruction[0]].run(+instruction[1],+instruction[2],+instruction[3], registers);
-    if (instruction == 29) {
-      console.log('res',registers);
+  const ipBind = result[1];
+  console.log('IP bound to ', ipBind);
+  let ip = 0;
+  let registers = [0, 0, 0, 0, 0, 0];
+  while (ip >= 0 && ip < inputLines.length) {
+    console.log('ip=' + ip, registers.slice(), inputLines[ip]);
+    let instruction = inputLines[ip].split(' ');
+
+    //OPTIMISER
+    if (ip == 8) {
+      while (registers[3] > 0) {
+        registers[5] = (((registers[5] + (registers[3] & 255)) & 0xFFFFFF) * 65899) & 0xFFFFFF;
+        registers[3] = registers[3] >> 8;
+      }
+      ip = 28;
+      continue;
+    }
+
+    if (ip == 28) {
+      return registers[+instruction[1]];
+    }
+    opcodes[instruction[0]].run(+instruction[1], +instruction[2], +instruction[3], registers);
+    if (instruction == 28) {
+      console.log('res', registers);
     }
     registers[ipBind]++;
     ip = registers[ipBind];
   }
-  return registers[0];
+}
+
+function part2(input) {
+  let inputLines = input.split(/\r?\n/);
+  let result = inputLines.shift().match(/#ip (\d+)/);
+  inputLines = inputLines.map((line) => line.trim());
+
+  const ipBind = result[1];
+  console.log('IP bound to ', ipBind);
+  let ip = 0;
+  let registers = [0, 0, 0, 0, 0, 0];
+  const prevResults = [];
+  while (ip >= 0 && ip < inputLines.length) {
+    //console.log('ip='+ip,registers.slice(), inputLines[ip]);
+    let instruction = inputLines[ip].split(' ');
+    //OPTIMISER
+    if (ip == 8) {
+      registers[5] = (((registers[5] + (registers[3] & 255)) & 16777215) * 65899) & 16777215;
+      while (256 <= registers[3]) {
+        registers[1] = 0;
+        do {
+          registers[2] = (registers[1] + 1) * 256;
+          registers[1]++;
+        } while (registers[2] <= registers[3]);
+        registers[1]--;
+        registers[3] = registers[1];
+        registers[5] = (((registers[5] + (registers[3] & 255)) & 16777215) * 65899) & 16777215;
+      }
+      registers[ipBind] = 28;
+      ip = registers[ipBind];
+      continue;
+    }
+
+    if (ip == 18) {
+      registers[2] = (registers[1] + 1) * 256;
+      while (registers[2] <= registers[3]) {
+        registers[1]++;
+        registers[2] = (registers[1] + 1) * 256;
+      }
+      registers[ipBind] = 26;
+      ip = registers[ipBind];
+      continue;
+    }
+    if (ip == 28) {
+      const r5 = registers[+instruction[1]];
+      if (prevResults.indexOf(r5) > -1) {
+        return prevResults[prevResults.length - 1];
+      }
+      prevResults.push(r5);
+    }
+    opcodes[instruction[0]].run(+instruction[1], +instruction[2], +instruction[3], registers);
+    if (instruction == 28) {
+      console.log('res', registers);
+    }
+    registers[ipBind]++;
+    ip = registers[ipBind];
+  }
 }
 
 module.exports.runInstruction = runInstruction;
-module.exports.executeProgram = executeProgram;
+module.exports.part1 = part1;
+module.exports.part2 = part2;

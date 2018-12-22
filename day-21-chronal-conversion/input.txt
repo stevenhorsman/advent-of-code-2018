@@ -1,32 +1,32 @@
 #ip 4
- 0: seti 123 0 5 // R5 = 123
- 1: bani 5 456 5 // R5 = R5 & 456 (123 & 456 = 0)
- 2: eqri 5 72 5 //if(R5 == 72) GOTO 05 : GOTO 1
- 3: addr 5 4 4 //
- 4: seti 0 0 4 //
- 5: seti 0 7 5 // R5 = 0
- 6loop: bori 5 65536 3 //R3 = R5 | 65536 (2^16)
- 7: seti 733884 6 5 //R5 = 733884
- 8: bani 3 255 1 //R1 = R3 & 255 // 8-13: r5 = (((r5 + (r3 & 255)) & 0xFFFFFF) * ) & 0xFFFFFF;
- 9: addr 5 1 5 //R5 += R1 //
-10: bani 5 16777215 5// R5 = R5 & 16777215 //
-12: muli 5 65899 5 //R5 = R5 * 65899 //
-13: bani 5 16777215 5 //R5 = R5 & 16777215 //
-14: gtir 256 3 1 // if 256 > R3 { goto 28 } else { goto 17}
-15: addr 1 4 4 //
-16: addi 4 1 4 //
-17: seti 27 8 4 // 
-18: seti 0 6 1 // R1 = 0;
-19: addi 1 1 2 // R2 = R1+1;
-20: muli 2 256 2 //R2 = R2 * 256 (shift 8)
-21: gtrr 2 3 2 // if reg[2] > reg[3] { goto 26 } else { goto 25 }
-22: addr 2 4 4 //
-23: addi 4 1 4 //
-24: seti 25 4 4 //(goto 26)
-25: addi 1 1 1  // R1++
-26: seti 17 8 4 // goto 18
-27: setr 1 7 3 //R3 = R1
-28: seti 7 0 4 // goto 8
-29: eqrr 5 0 1 //if (R0 == R5) halt else goto line:6 
-30: addr 1 4 4
-31: seti 5 9 4
+seti 123 0 5
+bani 5 456 5
+eqri 5 72 5
+addr 5 4 4
+seti 0 0 4
+seti 0 7 5
+bori 5 65536 3
+seti 733884 6 5
+bani 3 255 1
+addr 5 1 5
+bani 5 16777215 5
+muli 5 65899 5
+bani 5 16777215 5
+gtir 256 3 1
+addr 1 4 4
+addi 4 1 4
+seti 27 8 4
+seti 0 6 1
+addi 1 1 2
+muli 2 256 2
+gtrr 2 3 2
+addr 2 4 4
+addi 4 1 4
+seti 25 4 4
+addi 1 1 1
+seti 17 8 4
+setr 1 7 3
+seti 7 0 4
+eqrr 5 0 1
+addr 1 4 4
+seti 5 9 4
