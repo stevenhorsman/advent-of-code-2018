@@ -89,15 +89,14 @@ function executeProgram(input, register0Value = 0) {
   //console.log('ip='+ip,registers.slice(), inputLines[ip]);
   while(ip >= 0 && ip < inputLines.length) {
     let instruction = inputLines[ip].split(' ');
-        //OPTIMISER
+    //OPTIMISER
     if (ip == 2 && registers[1] != 0) {
-      //console.log('>>>>>in optimizer');
       if ((registers[4] % registers[1])==0){
         registers[0] += registers[1];
       }
-      registers[5] = 0;
       registers[3] = registers[4];
-      ip=12;
+      registers[ipBind] = 12;
+      ip=registers[ipBind];
       continue;
     }
 
