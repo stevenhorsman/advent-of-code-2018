@@ -81,8 +81,6 @@ class Nanobot {
 
 function calculateNanobotsInRange(input) {
   let nanobots = parseCoordinates(input).sort((a, b) => b.range - a.range);
-  nanobots.forEach(bot => console.log('{pos:['+bot.point.x+','+bot.point.y+',' + bot.point.z+'], r:'+bot.range+'},'));
-  
   let biggestRange = nanobots[0];
   return nanobots.filter(bot => bot.calculateManhattenDistance(biggestRange) <= biggestRange.range).length;
 }

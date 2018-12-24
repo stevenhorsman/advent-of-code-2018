@@ -8,9 +8,7 @@ const nanobots = require('./nanobots');
 const BoundingBox = nanobots.BoundingBox;
 const Point = nanobots.Point;
 
-const solution = require('./solution');
-
-describe('Day 23: Experimental Emergency Teleportation', () => {
+describe.only('Day 23: Experimental Emergency Teleportation', () => {
     
   describe('Part One', () => {
     it('should calculate range of nanobots', () => {
@@ -30,16 +28,6 @@ describe('Day 23: Experimental Emergency Teleportation', () => {
     it('Input file should return', () => {
       const input = fs.readFileSync('day-23-experimental-emergency-teleportation/input.txt').toString();
       expect(nanobots.calculateNanobotsInRange(input)).to.equal(619);
-    });
-
-    it('Input file should return', () => {
-      const input = fs.readFileSync('day-23-experimental-emergency-teleportation/input.txt').toString();
-      solution.run(input);
-    });
-
-    it('Input file should return', () => {
-      const input = fs.readFileSync('day-23-experimental-emergency-teleportation/input.txt').toString();
-      expect(nanobots.getNanobotsForPoint(input, 20407349, 13636438, 35377809)).to.equal(619);
     });
   });
 
@@ -99,7 +87,7 @@ describe('Day 23: Experimental Emergency Teleportation', () => {
       pos=<14,14,14>, r=6
       pos=<50,50,50>, r=200
       pos=<10,10,10>, r=5`;
-      expect(nanobots.calculateBestCoordinates(coords)).to.equal(36);
+      expect(nanobots.redditAttempt(coords)).to.equal(36);
     });
 
     it('Input file should return', () => {
@@ -107,7 +95,7 @@ describe('Day 23: Experimental Emergency Teleportation', () => {
       expect(nanobots.redditAttempt(input)).to.equal(71631000); //too low
     });
 
-    it('Input file should return', () => {
+    it.skip('Input file should return', () => {
       const input = fs.readFileSync('day-23-experimental-emergency-teleportation/input.txt').toString();
       expect(nanobots.calculateBestCoordinatesWithAnswer(input)).to.equal(71631000); //too low
     }).timeout(1000000);

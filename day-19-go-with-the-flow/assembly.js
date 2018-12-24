@@ -90,14 +90,16 @@ function executeProgram(input, register0Value = 0) {
   while(ip >= 0 && ip < inputLines.length) {
     let instruction = inputLines[ip].split(' ');
     //OPTIMISER
-    if (ip == 2 && registers[1] != 0) {
-      if ((registers[4] % registers[1])==0){
-        registers[0] += registers[1];
+    if (register0Value != 0) { //only optimise part 2
+      if (ip == 2 && registers[1] != 0) {
+        if ((registers[4] % registers[1])==0){
+          registers[0] += registers[1];
+        }
+        registers[3] = registers[4];
+        registers[ipBind] = 12;
+        ip=registers[ipBind];
+        continue;
       }
-      registers[3] = registers[4];
-      registers[ipBind] = 12;
-      ip=registers[ipBind];
-      continue;
     }
 
     opcodes[instruction[0]].run(+instruction[1],+instruction[2],+instruction[3], registers);
