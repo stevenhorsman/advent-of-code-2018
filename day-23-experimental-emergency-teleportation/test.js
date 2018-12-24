@@ -8,7 +8,7 @@ const nanobots = require('./nanobots');
 const BoundingBox = nanobots.BoundingBox;
 const Point = nanobots.Point;
 
-describe.only('Day 23: Experimental Emergency Teleportation', () => {
+describe('Day 23: Experimental Emergency Teleportation', () => {
     
   describe('Part One', () => {
     it('should calculate range of nanobots', () => {
